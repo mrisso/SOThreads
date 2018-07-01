@@ -31,19 +31,7 @@ public class Posto
 
     public boolean solicitarEntrada(Carro solicitante)
     {
-        Frentista f;
-
-        if(filaDeCarros.size() == 0)
-        {
-            if((f = solicitarFrentista()) != null)
-            {
-                f.abastecer(solicitante);
-                solicitante.abastecer(f);
-                return true;
-            }
-        }
-
-        else if(filaDeCarros.size() < 10)
+        if(filaDeCarros.size() < 10)
         {
             filaDeCarros.addLast(solicitante);
             return true;
@@ -52,9 +40,13 @@ public class Posto
         return false;
     }
 
-    public boolean solicitarCliente(Frentista trabalhador)
+    public boolean suaVez(Carro solicitante)
     {
+       if(solicitante.getID() == filaDeCarros.getFirst().getID()
+           && solicitarFrentista() != null)
+           return true;
 
+       return false;
     }
 
     public boolean solicitarDescarga()
