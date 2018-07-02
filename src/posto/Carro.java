@@ -44,7 +44,7 @@ public class Carro extends Thread
 
     // Método de Execução da Thread
     @Override
-    public void run()
+    public synchronized void run()
     {
         int contador = 0;
 
@@ -56,6 +56,7 @@ public class Carro extends Thread
             if(contador >= 10)
             {
                 // Acabar a execução da Thread caso a gasolina tenha acabado
+                System.out.println("Carro " + ID + " está sem gasolina");
                 return;
             }
 
@@ -63,11 +64,20 @@ public class Carro extends Thread
             long tempo = ThreadLocalRandom.current().nextInt(5,10);
 
             // Esperar pelo tempo calculado
+            System.out.println("Carro " + ID + " iniciou uma volta (" +
+            contador + ")");
+
+            System.out.println("Número de carros na fila: " + posto.estadoFila());
             try {
                 TimeUnit.SECONDS.sleep(tempo);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+        }
+
+        if(!posto.disponibilidadeFrentista())
+        {
+            System.out.println("Carro " + ID + " entrou na fila para abastecer");
         }
 
         while(!(posto.suaVez(this)))
@@ -79,8 +89,14 @@ public class Carro extends Thread
             }
         }
 
+        frentistaResponsavel.notifyAll();
+
         // Abastecendo
+        System.out.println("Carro " + ID + " está sendo abastecido pelo " +
+                "Frentista " + frentistaResponsavel.getID());
         abastecimento(tempoDeAbastecimento);
+
+        System.out.println("Carro " + ID + " terminou o abastecimento");
 
         notifyAll();
     }

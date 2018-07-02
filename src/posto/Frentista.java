@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Frentista extends Thread
 {
+    private int motivo;
     private boolean livre = true;
     private boolean liberado = false;
     private Carro solicitante;
@@ -25,21 +26,48 @@ public class Frentista extends Thread
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+       posto.abastecimento();
     }
 
     @Override
-    public void run()
+    public synchronized void run()
     {
         while(true)
         {
-            while (!(posto.solicitarCliente(this))) {
+            while (!(posto.solicitarCliente(this)))
+            {
+                if(motivo == 1)
+                {
+                    System.out.println("Frentista " +
+                            ID + " dormiu por falta de combustível no posto");
+                }
+
+                else if(motivo == 2)
+                {
+                    System.out.println("Frentista " +
+                            ID + " dormiu porque há um caminhão pronto para abastecer");
+                }
+
+                else if(motivo == 3)
+                {
+                    System.out.println("Frentista " +
+                            ID + " dormiu por falta de clientes");
+                }
+
                 try {
                     wait();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
+
+            System.out.println("Frentista " +
+                    + ID + " acordou!");
+
             abastecimento(tempoDeAbastecimento);
+            liberado = false;
+            livre = true;
 
             notifyAll();
         }
@@ -68,6 +96,11 @@ public class Frentista extends Thread
     public void setLiberado(boolean liberado)
     {
         this.liberado = liberado;
+    }
+
+    public void setMotivo(int motivo)
+    {
+        this.motivo = motivo;
     }
 
     public boolean isLiberado()
