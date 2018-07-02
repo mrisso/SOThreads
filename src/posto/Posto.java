@@ -3,9 +3,12 @@ package posto;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.LinkedList;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Posto
 {
+    private boolean caminhaoSolicitado = false;
+
     private int capacidade = 2000;
     private int disponibilidade = 2000;
     private int capacidadeFila = 10;
@@ -31,7 +34,7 @@ public class Posto
 
     public boolean solicitarEntrada(Carro solicitante)
     {
-        if(filaDeCarros.size() < 10)
+        if(filaDeCarros.size() < capacidadeFila)
         {
             filaDeCarros.addLast(solicitante);
             return true;
@@ -42,15 +45,36 @@ public class Posto
 
     public boolean suaVez(Carro solicitante)
     {
-       if(solicitante.getID() == filaDeCarros.getFirst().getID()
-           && solicitarFrentista() != null)
-           return true;
+        Frentista f;
 
-       return false;
+        if(disponibilidade >= 100)
+        {
+            if (solicitante.getID() == filaDeCarros.getFirst().getID()
+                    && (f = solicitarFrentista()) != null) {
+                // Cálculo de um tempo aleatório entre 8 e 10
+                long tempo = ThreadLocalRandom.current().nextInt(8,10);
+                f.setTempoDeAbastecimento(tempo);
+                solicitante.setTempoDeAbastecimento(tempo);
+                f.setSolicitante(solicitante);
+                solicitante.setFrentistaResponsavel(f);
+                f.setLiberado(true);
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    public boolean solicitarDescarga()
+    public boolean solicitarCliente(Frentista frentista)
     {
+        if(disponibilidade >= 100 && !caminhaoSolicitado && frentista.isLiberado())
+            return true;
 
+        return false;
     }
+
+//    public boolean solicitarDescarga()
+//   {
+//
+//   }
 }

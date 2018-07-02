@@ -10,6 +10,7 @@ public class Carro extends Thread
     private int ID;
     private Frentista frentistaResponsavel = null;
     private Posto posto;
+    private long tempoDeAbastecimento;
 
     // Construtor da Classe Carro
     public Carro(int ID, Posto posto)
@@ -29,6 +30,16 @@ public class Carro extends Thread
     public int getID()
     {
         return this.ID;
+    }
+
+    public void setFrentistaResponsavel(Frentista frentistaResponsavel)
+    {
+        this.frentistaResponsavel = frentistaResponsavel;
+    }
+
+    public void setTempoDeAbastecimento(long tempoDeAbastecimento)
+    {
+        this.tempoDeAbastecimento = tempoDeAbastecimento;
     }
 
     // Método de Execução da Thread
@@ -68,14 +79,20 @@ public class Carro extends Thread
             }
         }
 
+        // Abastecendo
+        abastecimento(tempoDeAbastecimento);
+
+        notifyAll();
     }
 
     // Funções de Controle
-
-    public void abastecer(Frentista frentistaResponsavel)
+    private void abastecimento(long tempoDeAbastecimento)
     {
-        this.frentistaResponsavel = frentistaResponsavel;
-        // Processo de abastecer -> wait e notify
+        // Esperar pelo tempo calculado
+        try {
+            TimeUnit.SECONDS.sleep(tempoDeAbastecimento);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
-
 }
